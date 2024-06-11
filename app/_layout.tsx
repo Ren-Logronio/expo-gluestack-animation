@@ -7,10 +7,15 @@ import {
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { GluestackUIProvider, Text, Box } from "@gluestack-ui/themed";
+import { GluestackUIProvider, Text, Box, VStack, ScrollView, styled } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
 import { useColorScheme } from "@/components/useColorScheme";
-import { Slot } from "expo-router";
+import { Slot, Tabs } from "expo-router";
+import { AnimationResolver } from "@gluestack-style/animation-resolver";
+import { MotionAnimationDriver } from '@gluestack-style/legend-motion-animation-driver';
+import BottomNavigationBar, { BottomNavigationBarItem } from "@/custom-components/BottomNavigationBar";
+import { useClientOnlyValue } from "@/components/useClientOnlyValue";
+import TransitionDirectionProvider from "@/custom-components/TransitionDirectionProvider";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -56,11 +61,21 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  
 
   return (
-    <GluestackUIProvider config={config}>
+    <GluestackUIProvider config={{...config, plugins: [new AnimationResolver(MotionAnimationDriver)]}}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Slot />
+        <TransitionDirectionProvider>
+          <ScrollView flex={1} pt="$10" px="$6">
+            <Slot />
+          </ScrollView>
+          <BottomNavigationBar>
+            <BottomNavigationBarItem href="/">Basic Animations</BottomNavigationBarItem>
+            <BottomNavigationBarItem href="/toggles">Toggles</BottomNavigationBarItem>
+            <BottomNavigationBarItem href="/ui">UI Elements</BottomNavigationBarItem>
+          </BottomNavigationBar>
+        </TransitionDirectionProvider>
       </ThemeProvider>
     </GluestackUIProvider>
   );
