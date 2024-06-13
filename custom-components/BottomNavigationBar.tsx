@@ -24,9 +24,12 @@ export default function BottomNavigationBar({ children }: { children: React.Reac
     const currentPathnameIndex = tabs.indexOf(pathname);
     const previousPathnameIndex = tabs.indexOf(globalParams.previousPathname);
     const animatedTabAccentDirection = currentPathnameIndex > previousPathnameIndex ? "right" : "left";
-    setDirection(animatedTabAccentDirection);
 
-    const animationMovementDistance = 5;
+    useEffect(() => {
+        setDirection(animatedTabAccentDirection);
+    }, [pathname])
+
+    const animationMovementDistance = 10;
 
     const animatedTabAccent = tabs.map((tab: string, idx: number) => {
         return styled(AnimatedView, {

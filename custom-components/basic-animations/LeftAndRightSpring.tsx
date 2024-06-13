@@ -3,7 +3,7 @@ import AnimationPanel from "../AnimationPanel";
 import { AnimatedView } from "@gluestack-style/animation-resolver";
 import { useToggle } from "../ToggleProvider";
 
-export default function LeftAndRight() {
+export default function LeftAndRightSpring() {
 
     const { autoToggle } = useToggle();
 
@@ -15,12 +15,17 @@ export default function LeftAndRight() {
         },
         ":animate": {
             x: autoToggle ? distance : 0,
+        },
+        ":transition": {
+            x: {
+                type: "spring",
+            }
         }
     });
     
     return (
         <AnimationPanel>
-            <Heading fontSize="$lg">x pos</Heading>
+            <Heading fontSize="$lg">x pos with spring</Heading>
             <AnimatedBoxView>
                 <Box w="$20" h="$20" backgroundColor="$rose500"></Box>
             </AnimatedBoxView>
