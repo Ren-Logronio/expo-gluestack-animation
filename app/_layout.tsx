@@ -16,6 +16,7 @@ import { MotionAnimationDriver } from '@gluestack-style/legend-motion-animation-
 import BottomNavigationBar, { BottomNavigationBarItem } from "@/custom-components/BottomNavigationBar";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import TransitionDirectionProvider from "@/custom-components/TransitionDirectionProvider";
+import ToggleProvider from "@/custom-components/ToggleProvider";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -67,14 +68,16 @@ function RootLayoutNav() {
     <GluestackUIProvider config={{...config, plugins: [new AnimationResolver(MotionAnimationDriver)]}}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <TransitionDirectionProvider>
-          <ScrollView flex={1} pt="$10" px="$6">
-            <Slot />
-          </ScrollView>
-          <BottomNavigationBar>
-            <BottomNavigationBarItem href="/">Basic Animations</BottomNavigationBarItem>
-            <BottomNavigationBarItem href="/toggles">Toggles</BottomNavigationBarItem>
-            <BottomNavigationBarItem href="/ui">UI Elements</BottomNavigationBarItem>
-          </BottomNavigationBar>
+          <ToggleProvider>
+            <ScrollView flex={1} pt="$10" px="$6">
+              <Slot />
+            </ScrollView>
+            <BottomNavigationBar>
+              <BottomNavigationBarItem href="/">Basic Animations</BottomNavigationBarItem>
+              <BottomNavigationBarItem href="/toggles">Toggles</BottomNavigationBarItem>
+              <BottomNavigationBarItem href="/ui">UI Elements</BottomNavigationBarItem>
+            </BottomNavigationBar>
+          </ToggleProvider>
         </TransitionDirectionProvider>
       </ThemeProvider>
     </GluestackUIProvider>

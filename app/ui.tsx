@@ -46,15 +46,9 @@ import LeftAndRight from "@/custom-components/basic-animations/LeftAndRight";
     return (
       <VStack flex={1} backgroundColor="$white" space="lg">
       <Heading>UI Elements</Heading>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
+      <Center flex={1} h="$full">
+        <Text>Nothing to Show</Text>
+      </Center>
     </VStack>
     );
   }

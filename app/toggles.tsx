@@ -16,6 +16,7 @@ import {
   import { useState } from "react";
   import { AnimatedHeader } from "@/custom-components/AnimatedHeader";
 import LeftAndRight from "@/custom-components/basic-animations/LeftAndRight";
+import Tap from "@/custom-components/toggle-animations/Tap";
   
   // const StyledAnimatedView = styled(AnimatedView, {
   //   ":initial": {
@@ -47,15 +48,10 @@ import LeftAndRight from "@/custom-components/basic-animations/LeftAndRight";
     return (
       <VStack flex={1} backgroundColor="$white" space="lg">
       <Heading>Toggles</Heading>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
-      <LeftAndRight/>
+      <Tap/>
+      {/* <Center flex={1} h="$full">
+        <Text>Nothing to Show</Text>
+      </Center> */}
     </VStack>
     );
   }
