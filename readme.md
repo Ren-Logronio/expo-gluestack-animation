@@ -1,8 +1,37 @@
+# Gluestack UI Animations
+
+##### Gluestack Animation Components
+
+> Note: No such component as AnimatedLinearGradient, animating gradients from gluestack components might require some complicated workarounds
+
+* AnimatedText,
+* AnimatedView,
+* AnimatedPressable
+* AnimatedImage,
+* AnimatedScrollView,
+* AnimatedSafeAreaView,
+* AnimatedFlatList,
+* AnimatedSectionList,
+* AnimatePresence ( enables animation to wrapped animation components based on mount and unmount events )
+
+  SVG Related Animation Components
+* AnimatedSvg,
+* AnimatedRect,
+* AnimatedCircle,
+* AnimatedEllipse,
+* AnimatedLine,
+* AnimatedPolyline,
+* AnimatedPath,
+* AnimatedTSpan,
+* AnimatedTextPath,
+* AnimatedG,
+* AnimatedClipPath,
+
 ##### Gluestack Animation Aliases
 
-> aliases was intended to be used as generalization of animation props from animation libraries (e.g legendapp motion, framer motion, moti)
->
-> note: currently, only [legendapp motion](https://www.npmjs.com/package/@gluestack-style/legend-motion-animation-driver) is available for their animation, the gluestack team stated that driver for moti is available too but so far no npm package is present indicating that that was true
+aliases was intended to be used as generalization of animation props from animation libraries (e.g legendapp motion, framer motion, moti)
+
+> note: currently, only [legendapp motion](https://www.npmjs.com/package/@gluestack-style/legend-motion-animation-driver) is available for their animation, the gluestack team stated that driver for moti is available too but so far no npm package is present indicating that that was factual
 
 | Alias                     | Prop                     | Example Value                                                                                                                                                                                                                                                    | Notes                                                                                                                                                                                                   |
 | :------------------------ | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -19,7 +48,7 @@
 
 ##### ":animate" / ":animateProps" / animate / animateProps StyleProps
 
-> in cases where animate props are provided outside of gluestack styled() function, the provided values must be from react-native's stylesheet values, and gluestack values like "$0", "\$..", "\$rose500" will also not work
+> Note: in cases where animate props are provided outside of gluestack styled() function, the provided values must be from react-native's stylesheet values, and gluestack values like "$0", "\$..", "\$rose500" will also likely not work
 
 | property                                 | type        | Exmple value                                                           | Notes                                                                                                                                                                                               |
 | ---------------------------------------- | ----------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
