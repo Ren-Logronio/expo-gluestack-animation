@@ -1,8 +1,8 @@
 import { Box, Center, Heading, styled } from "@gluestack-ui/themed";
-import AnimationPanel from "../AnimationPanel";
 import { AnimatedPressable } from "@gluestack-style/animation-resolver";
 import { useToggle } from "../ToggleProvider";
 import { useState } from "react";
+import { VStack } from "@gluestack-ui/themed";
 
 const AnimatedBoxPressable = styled(AnimatedPressable, {
     w: "$20",
@@ -24,13 +24,13 @@ export default function Tap() {
     const [isTapped, setIsTapped] = useState(false);
     
     return (
-        <AnimationPanel>
+        <VStack space="lg" flex={1} borderColor="$rose200" borderWidth="$1" p="$4">
             <Heading fontSize="$lg">Tapped</Heading>
             <AnimatedBoxPressable 
                 animate={{ x: isTapped ? 200 : 0 }}
                 onPress={() => setIsTapped(!isTapped)}
             >
             </AnimatedBoxPressable>
-        </AnimationPanel>
+        </VStack>
     );
 }
