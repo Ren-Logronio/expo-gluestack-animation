@@ -9,15 +9,12 @@ import {
 } from "@gluestack-ui/themed";
 import { useState, useEffect } from "react";
 import { useToggle } from "@/custom-components/ToggleProvider";
-import { AnimatedView } from "@gluestack-style/animation-resolver";
+import { AnimatedView,  } from "@gluestack-style/animation-resolver";
 import CustomVStack from "@/custom-components/CustomVStack";
 import Filler from "@/custom-components/Filler";
 import AnimatedBoxView from "@/custom-components/AnimatedBoxView";
 import { Center } from "@gluestack-ui/themed";
 
-const test = styled(AnimatedView, {
-  
-});
 
 
 export default function Home() {
@@ -33,6 +30,7 @@ export default function Home() {
 
       <HStack space="lg">
 
+        {/*//* OPACITY ANIMATION  */}
         <CustomVStack>
           <Heading>opacity</Heading>
           <AnimatedBoxView 
@@ -45,6 +43,7 @@ export default function Home() {
           />
         </CustomVStack>
 
+        {/*//* COLOR ANIMATION  */}
         <CustomVStack>
           <Heading>color</Heading>
           <AnimatedBoxView 
@@ -57,6 +56,7 @@ export default function Home() {
           />
         </CustomVStack>
 
+        {/*//* GRADIENT ANIMATION  */}
         <CustomVStack>
           <Heading>gradient</Heading>
           <AnimatedBoxView>
@@ -69,6 +69,7 @@ export default function Home() {
         
       </HStack>
 
+      {/*//* POSITION X ANIMATION  */}
       <CustomVStack>
         <Heading>x position</Heading>
         <AnimatedBoxView 
@@ -81,12 +82,9 @@ export default function Home() {
         />
       </CustomVStack>
 
-      <CustomVStack>
-        <Heading>test</Heading>
-      </CustomVStack>
-
       <HStack space="lg">
         
+      {/*//* POSITION Y ANIMATION  */}
       <CustomVStack>
         <Heading>y position</Heading>
         <AnimatedBoxView 
@@ -100,6 +98,8 @@ export default function Home() {
       </CustomVStack>
 
         <VStack space="lg">
+
+          {/*//* ROTATION ANIMATION  */}
           <CustomVStack>
             <Heading>rotation</Heading>
             <AnimatedBoxView 
@@ -112,7 +112,7 @@ export default function Home() {
             />
           </CustomVStack>
 
-
+          {/*//* ROTATION X ANIMATION  */}
           <CustomVStack>
             <Heading>rotation x</Heading>
             <AnimatedBoxView 
@@ -131,7 +131,7 @@ export default function Home() {
             </AnimatedBoxView>
           </CustomVStack>
 
-
+          {/*//* ROTATION Y ANIMATION  */}
           <CustomVStack>
             <Heading>rotation y</Heading>
             <AnimatedBoxView 
@@ -151,7 +151,8 @@ export default function Home() {
           </VStack>
         
       </HStack>
-
+              
+        {/*//* ROTATION XY ANIMATION  */}
       <CustomVStack>
         <Heading>rotation xy</Heading>
         <AnimatedBoxView 
@@ -171,6 +172,7 @@ export default function Home() {
 
       <HStack space="md">
 
+        {/*//* SCALE ANIMATION  */}
         <CustomVStack>
           <Heading>scale</Heading>
           <AnimatedBoxView 
@@ -183,6 +185,7 @@ export default function Home() {
           />
         </CustomVStack>
 
+        {/*//* SCALE X ANIMATION  */}
         <CustomVStack>
           <Heading>scale x</Heading>
           <AnimatedBoxView 
@@ -195,6 +198,7 @@ export default function Home() {
           />
         </CustomVStack>
 
+        {/*//* SCALE Y ANIMATION  */}
         <CustomVStack>
           <Heading>scale y</Heading>
           <AnimatedBoxView 
