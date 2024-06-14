@@ -50,10 +50,12 @@ export default function Root() {
     <VStack flex={1} backgroundColor="$white" space="lg">
     <Heading>Toggles</Heading>
 
+    {/*//* ON PRESS ANIMATION  */}
     <Tap/>
 
     <HStack space="lg">
 
+      {/*//* WHILE PRESSED IN ANIMATION  */}
       <CustomVStack>
         <Heading>While Tapped</Heading>
         <CustomAnimatedPressable
@@ -73,7 +75,7 @@ export default function Root() {
 
     </HStack>
     
-    
+    {/*//* STIFFNESS AND DAMPENING ANIMATION */}
     <CustomVStack space="lg">
       <Heading>Stiffness and Dampening</Heading>
       <Text>Type</Text>
