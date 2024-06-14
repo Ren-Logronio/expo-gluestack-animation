@@ -3,6 +3,7 @@ import { AnimatedView } from "@gluestack-style/animation-resolver";
 import { Link, useRouter, usePathname, useLocalSearchParams, useGlobalSearchParams  } from "expo-router";
 import { useEffect, useState } from "react";
 import { useTransitionDirection } from "./TransitionDirectionProvider";
+import { Dimensions } from "react-native";
 
 export const BottomNavigationBarBottomBody = styled(VStack, {
     width: "$full",
@@ -10,6 +11,12 @@ export const BottomNavigationBarBottomBody = styled(VStack, {
     //
     borderWidth: "$1",
     borderColor: "$rose100",
+});
+
+export const AnimatedBox = styled(AnimatedView, {
+    h: "$full",
+    borderRadius: "$full",
+    backgroundColor: "$rose300",
 });
 
 export default function BottomNavigationBar({ children }: { children: React.ReactNode }) {
@@ -31,25 +38,38 @@ export default function BottomNavigationBar({ children }: { children: React.Reac
 
     const animationMovementDistance = 10;
 
-    const animatedTabAccent = tabs.map((tab: string, idx: number) => {
-        return styled(AnimatedView, {
-            flex: 1,
-            backgroundColor: "$rose300",
-            ":initial": {
-                opacity: previousPathnameIndex === idx ? 1 : 0,
-                x: previousPathnameIndex === idx ? 0 : animatedTabAccentDirection === "right" ? -animationMovementDistance : animationMovementDistance,
-            },
-            ":animate": {
-                opacity: currentPathnameIndex === idx ? 1 : 0,
-                x: currentPathnameIndex === idx ? 0 : animatedTabAccentDirection === "right" ? animationMovementDistance : -animationMovementDistance,
-            },
-        });
-    });
+    // const animatedTabAccent = tabs.map((tab: string, idx: number) => {
+    //     return styled(AnimatedView, {
+    //         flex: 1,
+    //         backgroundColor: "$rose300",
+    //         ":initial": {
+    //             opacity: previousPathnameIndex === idx ? 1 : 0,
+    //             x: previousPathnameIndex === idx ? 0 : animatedTabAccentDirection === "right" ? -animationMovementDistance : animationMovementDistance,
+    //         },
+    //         ":animate": {
+    //             opacity: currentPathnameIndex === idx ? 1 : 0,
+    //             x: currentPathnameIndex === idx ? 0 : animatedTabAccentDirection === "right" ? animationMovementDistance : -animationMovementDistance,
+    //         },
+    //     });
+    // });
 
     return <BottomNavigationBarBottomBody>
         {/* <Text>{previousPathname}</Text> */}
-        <HStack justifyContent="space-evenly" minHeight="$1" width="$full">
-            {animatedTabAccent.map((Accent: any, index: number) => <Accent key={index}></Accent>)}
+        <HStack justifyContent="flex-start" minHeight="$1" width="$full">
+            <AnimatedBox
+                animate={{
+                    width: Dimensions.get("window").width / tabs.length,
+                    left: currentPathnameIndex * (Dimensions.get("window").width / tabs.length),
+                }}
+                transition={{
+                    type: "spring",
+                    // dampening: 20,
+                    // stiffness: 250,
+                    duration: 50,
+                    timing: "ms"
+                }}
+            ></AnimatedBox>
+            {/* {animatedTabAccent.map((Accent: any, index: number) => <Accent key={index}></Accent>)} */}
             {/* {tabs.map((tab: any, index: number) => <>
                 <Box key={index} flex={1} backgroundColor="$rose100" opacity={tab === pathname ? "$100" : "$0"}></Box>
             </>)} */}
