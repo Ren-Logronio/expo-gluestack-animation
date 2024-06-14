@@ -74,8 +74,9 @@ function RootLayoutNav() {
             </ScrollView>
             <BottomNavigationBar>
               <BottomNavigationBarItem href="/">Basic Animations</BottomNavigationBarItem>
-              <BottomNavigationBarItem href="/toggles">Toggles</BottomNavigationBarItem>
-              <BottomNavigationBarItem href="/ui">UI Elements</BottomNavigationBarItem>
+              <BottomNavigationBarItem href="/toggles">Toggling</BottomNavigationBarItem>
+              <BottomNavigationBarItem href="/presence">Animate Presence</BottomNavigationBarItem>
+              {/* <BottomNavigationBarItem href="/ui">UI Elements</BottomNavigationBarItem> */}
             </BottomNavigationBar>
           </ToggleProvider>
         </TransitionDirectionProvider>
