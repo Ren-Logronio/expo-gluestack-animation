@@ -17,6 +17,7 @@ import BottomNavigationBar, { BottomNavigationBarItem } from "@/custom-component
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import TransitionDirectionProvider from "@/custom-components/TransitionDirectionProvider";
 import ToggleProvider from "@/custom-components/ToggleProvider";
+import * as Application from 'expo-application';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -62,7 +63,6 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  
 
   return (
     <GluestackUIProvider config={{...config, plugins: [new AnimationResolver(MotionAnimationDriver)]}}>
@@ -73,9 +73,11 @@ function RootLayoutNav() {
               <Slot />
             </ScrollView>
             <BottomNavigationBar>
-              <BottomNavigationBarItem href="/">Basic Animations</BottomNavigationBarItem>
+              <BottomNavigationBarItem href="/">UI Elements</BottomNavigationBarItem>
               <BottomNavigationBarItem href="/toggles">Toggling</BottomNavigationBarItem>
               <BottomNavigationBarItem href="/presence">Animate Presence</BottomNavigationBarItem>
+              <BottomNavigationBarItem href="/basic">Basic Animations</BottomNavigationBarItem>
+              {/* <BottomNavigationBarItem href="/svg">Svg</BottomNavigationBarItem> */}
               {/* <BottomNavigationBarItem href="/ui">UI Elements</BottomNavigationBarItem> */}
             </BottomNavigationBar>
           </ToggleProvider>
