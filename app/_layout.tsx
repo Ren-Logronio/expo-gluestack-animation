@@ -73,12 +73,9 @@ function RootLayoutNav() {
               <Slot />
             </ScrollView>
             <BottomNavigationBar>
-              <BottomNavigationBarItem href="/">UI Elements</BottomNavigationBarItem>
-              <BottomNavigationBarItem href="/toggles">Toggling</BottomNavigationBarItem>
-              <BottomNavigationBarItem href="/presence">Animate Presence</BottomNavigationBarItem>
-              <BottomNavigationBarItem href="/basic">Basic Animations</BottomNavigationBarItem>
-              {/* <BottomNavigationBarItem href="/svg">Svg</BottomNavigationBarItem> */}
-              {/* <BottomNavigationBarItem href="/ui">UI Elements</BottomNavigationBarItem> */}
+              <BottomNavigationBarItem href="/">Test</BottomNavigationBarItem>
+              <BottomNavigationBarItem href="/toggles">Gluestack</BottomNavigationBarItem>
+              <BottomNavigationBarItem href="/basic">Gluestack Animations</BottomNavigationBarItem>
             </BottomNavigationBar>
           </ToggleProvider>
         </TransitionDirectionProvider>

@@ -1,42 +1,44 @@
-
-import {
-  Heading,
-  VStack,
-  styled,
-  Fab,
-  FabLabel,
-  Text,
-} from "@gluestack-ui/themed";
+import { Heading, Text, VStack } from "@gluestack-ui/themed";
 import { useToggle } from "@/custom-components/ToggleProvider";
-import { AnimatePresence, AnimatedText, AnimatedView,  } from "@gluestack-style/animation-resolver";
 import CustomVStack from "@/custom-components/CustomVStack";
+import { Animated } from "react-native";
+import { Defs, Path, Pattern, Svg } from "react-native-svg";
+import { useEffect, useRef } from "react";
 
-const StyledAnimatedText = styled(AnimatedText, {
-  ":initial": {opacity: 1},
-  ":animate": {opacity: 0},
-  ":transition": {
-    duration: 500,
-    type: "spring",
-  }
-});
-
-const staggeredText = "Hello world, this is a staggered text animation. The effect slowly reveal the entire text word by word."
+const staggeredText =
+  "Hello world, this is a staggered text animation. The effect slowly reveal the entire text word by word.";
 
 export default function Home() {
-
   const { autoToggle } = useToggle();
 
   return (
     <VStack flex={1} backgroundColor="$white" space="lg">
-      {/* <Fab placement="top right">
-        <FabLabel>Reanimate</FabLabel>
-      </Fab> */}
-      <Heading>UI Elements</Heading>
-      <CustomVStack h="$96">
-        <Heading>Staggered Text</Heading>
-        <AnimatePresence>
-          <StyledAnimatedText color="$amber500">test</StyledAnimatedText>
-        </AnimatePresence>
+      <Heading>Test</Heading>
+      <CustomVStack h="$40">
+        <Heading>SVG Wave</Heading>
+        <Svg>
+          <Defs>
+            <Pattern
+              viewBox="10 0 170 100"
+              id="pattern"
+              patternUnits="userSpaceOnUse"
+              width={80}
+              height={80}
+            >
+              <Path
+                d={`M10 80 C 40 10, 65 10, 95 80 S 150 150, 180 80`}
+                stroke="black"
+                strokeWidth={5}
+                fill="transparent"
+              />
+            </Pattern>
+          </Defs>
+          <Path fill="url(#pattern)" d="M0 0 L0 100 L800 100 L800 0 Z" />
+        </Svg>
+        <Text>
+          Note: Pattern rendering is slow, might be an issue with
+          react-native-svg
+        </Text>
       </CustomVStack>
     </VStack>
   );
