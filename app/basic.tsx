@@ -1,18 +1,10 @@
-
-import {
-  HStack,
-  Heading,
-  Text,
-  VStack,
-} from "@gluestack-ui/themed";
+import { HStack, Heading, Text, VStack } from "@gluestack-ui/themed";
 import { useState } from "react";
 import { useToggle } from "@/custom-components/ToggleProvider";
 import CustomVStack from "@/custom-components/CustomVStack";
 import Filler from "@/custom-components/Filler";
 import AnimatedBoxView from "@/custom-components/AnimatedBoxView";
 import { Center } from "@gluestack-ui/themed";
-
-
 
 export default function Home() {
   const [isPressed, setIsPressed] = useState(false);
@@ -21,16 +13,14 @@ export default function Home() {
   const distance = 200;
 
   return (
-    <VStack flex={1} backgroundColor="$white" space="lg">
+    <VStack flex={1} backgroundColor="$white" space="lg" px="$6">
       <Heading>Basic Animations</Heading>
 
-
       <HStack space="lg">
-
         {/*//* OPACITY ANIMATION  */}
         <CustomVStack>
           <Heading>opacity</Heading>
-          <AnimatedBoxView 
+          <AnimatedBoxView
             animate={{
               opacity: autoToggle ? 0 : 1,
             }}
@@ -43,7 +33,7 @@ export default function Home() {
         {/*//* COLOR ANIMATION  */}
         <CustomVStack>
           <Heading>color</Heading>
-          <AnimatedBoxView 
+          <AnimatedBoxView
             animate={{
               backgroundColor: autoToggle ? "hsl(23, 100%, 50%)" : "#0bf",
             }}
@@ -62,17 +52,15 @@ export default function Home() {
             </Center>
           </AnimatedBoxView>
         </CustomVStack>
-
-        
       </HStack>
 
       {/*//* POSITION X ANIMATION  */}
       <CustomVStack>
         <Heading>x position</Heading>
-        <AnimatedBoxView 
+        <AnimatedBoxView
           animate={{
             left: autoToggle ? distance : 0,
-          }} 
+          }}
           transition={{
             type: "spring",
           }}
@@ -80,26 +68,24 @@ export default function Home() {
       </CustomVStack>
 
       <HStack space="lg">
-        
-      {/*//* POSITION Y ANIMATION  */}
-      <CustomVStack>
-        <Heading>y position</Heading>
-        <AnimatedBoxView 
-          animate={{
-            top: autoToggle ? distance : 0,
-          }} 
-          transition={{
-            type: "spring",
-          }}
-        />
-      </CustomVStack>
+        {/*//* POSITION Y ANIMATION  */}
+        <CustomVStack>
+          <Heading>y position</Heading>
+          <AnimatedBoxView
+            animate={{
+              top: autoToggle ? distance : 0,
+            }}
+            transition={{
+              type: "spring",
+            }}
+          />
+        </CustomVStack>
 
         <VStack space="lg">
-
           {/*//* ROTATION ANIMATION  */}
           <CustomVStack>
             <Heading>rotation</Heading>
-            <AnimatedBoxView 
+            <AnimatedBoxView
               animate={{
                 rotate: autoToggle ? "90deg" : "0deg",
               }}
@@ -112,7 +98,7 @@ export default function Home() {
           {/*//* ROTATION X ANIMATION  */}
           <CustomVStack>
             <Heading>rotation x</Heading>
-            <AnimatedBoxView 
+            <AnimatedBoxView
               shadowColor="#000"
               shadowOpacity={0.2}
               animate={{
@@ -131,7 +117,7 @@ export default function Home() {
           {/*//* ROTATION Y ANIMATION  */}
           <CustomVStack>
             <Heading>rotation y</Heading>
-            <AnimatedBoxView 
+            <AnimatedBoxView
               animate={{
                 rotateY: autoToggle ? "50deg" : "0deg",
               }}
@@ -144,15 +130,13 @@ export default function Home() {
               </Center>
             </AnimatedBoxView>
           </CustomVStack>
-
-          </VStack>
-        
+        </VStack>
       </HStack>
-              
-        {/*//* ROTATION XY ANIMATION  */}
+
+      {/*//* ROTATION XY ANIMATION  */}
       <CustomVStack>
         <Heading>rotation xy</Heading>
-        <AnimatedBoxView 
+        <AnimatedBoxView
           animate={{
             rotateX: autoToggle ? "40deg" : "0deg",
             rotateY: autoToggle ? "40deg" : "0deg",
@@ -168,11 +152,10 @@ export default function Home() {
       </CustomVStack>
 
       <HStack space="md">
-
         {/*//* SCALE ANIMATION  */}
         <CustomVStack>
           <Heading>scale</Heading>
-          <AnimatedBoxView 
+          <AnimatedBoxView
             animate={{
               scale: autoToggle ? 0.5 : 1,
             }}
@@ -185,7 +168,7 @@ export default function Home() {
         {/*//* SCALE X ANIMATION  */}
         <CustomVStack>
           <Heading>scale x</Heading>
-          <AnimatedBoxView 
+          <AnimatedBoxView
             animate={{
               scaleX: autoToggle ? 0.5 : 1,
             }}
@@ -198,7 +181,7 @@ export default function Home() {
         {/*//* SCALE Y ANIMATION  */}
         <CustomVStack>
           <Heading>scale y</Heading>
-          <AnimatedBoxView 
+          <AnimatedBoxView
             animate={{
               scaleY: autoToggle ? 0.5 : 1,
             }}
@@ -207,9 +190,7 @@ export default function Home() {
             }}
           />
         </CustomVStack>
-
       </HStack>
-      
 
       <Filler />
     </VStack>

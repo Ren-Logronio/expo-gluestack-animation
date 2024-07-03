@@ -7,17 +7,27 @@ import {
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { GluestackUIProvider, Text, Box, VStack, ScrollView, styled } from "@gluestack-ui/themed";
+import {
+  GluestackUIProvider,
+  Text,
+  Box,
+  VStack,
+  ScrollView,
+  styled,
+} from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
 import { useColorScheme } from "@/components/useColorScheme";
-import { Slot, Tabs } from "expo-router";
+import { Slot, Tabs, router, usePathname } from "expo-router";
 import { AnimationResolver } from "@gluestack-style/animation-resolver";
-import { MotionAnimationDriver } from '@gluestack-style/legend-motion-animation-driver';
-import BottomNavigationBar, { BottomNavigationBarItem } from "@/custom-components/BottomNavigationBar";
+import { MotionAnimationDriver } from "@gluestack-style/legend-motion-animation-driver";
+import BottomNavigationBar, {
+  BottomNavigationBarItem,
+} from "@/custom-components/BottomNavigationBar";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import TransitionDirectionProvider from "@/custom-components/TransitionDirectionProvider";
 import ToggleProvider from "@/custom-components/ToggleProvider";
-import * as Application from 'expo-application';
+import * as Application from "expo-application";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -62,21 +72,35 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const pathname = usePathname();
   const colorScheme = useColorScheme();
 
   return (
-    <GluestackUIProvider config={{...config, plugins: [new AnimationResolver(MotionAnimationDriver)]}}>
+    <GluestackUIProvider
+      config={{
+        ...config,
+        plugins: [new AnimationResolver(MotionAnimationDriver)],
+      }}
+    >
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <TransitionDirectionProvider>
           <ToggleProvider>
-            <ScrollView flex={1} pt="$10" px="$6">
-              <Slot />
+            <ScrollView flex={1}>
+              <SafeAreaView>
+                <Slot />
+              </SafeAreaView>
             </ScrollView>
-            <BottomNavigationBar>
-              <BottomNavigationBarItem href="/">Test</BottomNavigationBarItem>
-              <BottomNavigationBarItem href="/toggles">Gluestack</BottomNavigationBarItem>
-              <BottomNavigationBarItem href="/basic">Gluestack Animations</BottomNavigationBarItem>
-            </BottomNavigationBar>
+            {!pathname.startsWith("/animation") && (
+              <BottomNavigationBar>
+                <BottomNavigationBarItem href="/">Test</BottomNavigationBarItem>
+                <BottomNavigationBarItem href="/toggles">
+                  Gluestack
+                </BottomNavigationBarItem>
+                <BottomNavigationBarItem href="/basic">
+                  Gluestack Animations
+                </BottomNavigationBarItem>
+              </BottomNavigationBar>
+            )}
           </ToggleProvider>
         </TransitionDirectionProvider>
       </ThemeProvider>
