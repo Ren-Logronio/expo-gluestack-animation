@@ -1,8 +1,6 @@
 import { AnimatedView } from "@gluestack-style/animation-resolver";
 import { Pressable, Textarea, TextareaInput } from "@gluestack-ui/themed";
 import {
-  Button,
-  ButtonText,
   Center,
   Heading,
   HStack,
@@ -10,7 +8,6 @@ import {
   VStack,
   View,
   styled,
-  set,
 } from "@gluestack-ui/themed";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
