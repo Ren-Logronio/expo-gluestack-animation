@@ -12,12 +12,10 @@ import {
   styled,
   set,
 } from "@gluestack-ui/themed";
-import { getIosPushNotificationServiceEnvironmentAsync } from "expo-application";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Animated,
   GestureResponderEvent,
   useWindowDimensions,
