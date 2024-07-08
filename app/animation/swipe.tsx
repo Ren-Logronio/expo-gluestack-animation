@@ -54,12 +54,6 @@ export default function Swipe() {
     }
   }, [disabled]);
 
-  const handleResponderMove = (event: GestureResponderEvent) => {
-    if (!disabled) return;
-    prevTouchEvent.current = event.nativeEvent;
-    liftViewY.setValue(event.nativeEvent.pageY - liftedViewHeight);
-  };
-
   const animateSpringBackToBottom = (animatedValue: Animated.Value) => {
     Animated.spring(animatedValue, {
       toValue: 0,
@@ -72,6 +66,12 @@ export default function Swipe() {
       toValue: -liftedViewHeight,
       useNativeDriver: false,
     }).start();
+  };
+
+  const handleResponderMove = (event: GestureResponderEvent) => {
+    if (!disabled) return;
+    prevTouchEvent.current = event.nativeEvent;
+    liftViewY.setValue(event.nativeEvent.pageY - liftedViewHeight);
   };
 
   const handleResponderRelease = (event: GestureResponderEvent) => {
@@ -96,7 +96,7 @@ export default function Swipe() {
   return (
     <View flex={1}>
       <View bg="$lightBlue300" flex={1}>
-        <SecondView liftViewY={liftViewY} begin={feedbackCompleted} />
+        <SecondScreen liftViewY={liftViewY} begin={feedbackCompleted} />
       </View>
       <StyledAnimatedView
         position="absolute"
@@ -106,7 +106,7 @@ export default function Swipe() {
           top: liftViewY,
         }}
       >
-        <FirstScreen onComplete={setDisabled} />
+        <FirstScreen onChangeComplete={setDisabled} />
         <View
           flex={1}
           maxHeight="$20"
@@ -134,7 +134,11 @@ export default function Swipe() {
   );
 }
 
-export function FirstScreen({ onComplete }: { onComplete: () => void }) {
+export function FirstScreen({
+  onChangeComplete,
+}: {
+  onChangeComplete: (completed: boolean) => void;
+}) {
   return (
     <View
       flex={1}
@@ -146,10 +150,10 @@ export function FirstScreen({ onComplete }: { onComplete: () => void }) {
         <Heading color="white">Feedback</Heading>
         <ReviewForm
           onCompleted={() => {
-            onComplete && onComplete(true);
+            onChangeComplete && onChangeComplete(true);
           }}
           onUncompleted={() => {
-            onComplete && onComplete(false);
+            onChangeComplete && onChangeComplete(false);
           }}
         />
         <Textarea size="md" w="$72" mt="$4" borderColor="white">
@@ -160,7 +164,7 @@ export function FirstScreen({ onComplete }: { onComplete: () => void }) {
   );
 }
 
-export function SecondView({
+export function SecondScreen({
   begin,
   liftViewY,
 }: {
