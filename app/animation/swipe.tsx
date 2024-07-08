@@ -19,6 +19,7 @@ import {
   ActivityIndicator,
   Alert,
   Animated,
+  GestureResponderEvent,
   useWindowDimensions,
 } from "react-native";
 import { Svg, Path } from "react-native-svg";
@@ -28,8 +29,8 @@ const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 export default function Swipe() {
-  const [viewYLiftable, setViewYLiftable] = useState(false);
-  const [reviewCompleted, setReviewCompleted] = useState(false);
+  const [disabled, setDisabled] = useState(false);
+  const [feedbackCompleted, setFeedbackCompleted] = useState(false);
   const liftViewY = useRef(new Animated.Value(0)).current;
   const liftBoxY = useRef(new Animated.Value(0)).current;
   const roundBoxBottom = liftBoxY.interpolate({
@@ -40,7 +41,7 @@ export default function Swipe() {
   const prevTouchEvent = useRef({ pageY: 0, timestamp: 0 });
 
   useEffect(() => {
-    if (viewYLiftable) {
+    if (disabled) {
       Animated.spring(liftBoxY, {
         toValue: 80,
         useNativeDriver: false,
@@ -51,12 +52,51 @@ export default function Swipe() {
         useNativeDriver: false,
       }).start();
     }
-  }, [viewYLiftable]);
+  }, [disabled]);
+
+  const handleResponderMove = (event: GestureResponderEvent) => {
+    if (!disabled) return;
+    prevTouchEvent.current = event.nativeEvent;
+    liftViewY.setValue(event.nativeEvent.pageY - liftedViewHeight);
+  };
+
+  const animateSpringBackToBottom = (animatedValue: Animated.Value) => {
+    Animated.spring(animatedValue, {
+      toValue: 0,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const animateSpringOutOfScreen = (animatedValue: Animated.Value) => {
+    Animated.spring(animatedValue, {
+      toValue: -liftedViewHeight,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const handleResponderRelease = (event: GestureResponderEvent) => {
+    const pageY = event.nativeEvent?.pageY;
+    const timestamp = event.nativeEvent?.timestamp;
+    const prevPageY = prevTouchEvent.current?.pageY;
+    const prevTimestamp = prevTouchEvent.current?.timestamp;
+    const velocity = calculateVelocity(
+      prevPageY,
+      pageY,
+      prevTimestamp,
+      timestamp
+    );
+    if (pageY > liftedViewHeight * 0.2 && velocity < 1.5) {
+      animateSpringBackToBottom(liftViewY);
+    } else {
+      animateSpringOutOfScreen(liftViewY);
+      setFeedbackCompleted(true);
+    }
+  };
 
   return (
     <View flex={1}>
       <View bg="$lightBlue300" flex={1}>
-        <SecondView liftViewY={liftViewY} begin={reviewCompleted} />
+        <SecondView liftViewY={liftViewY} begin={feedbackCompleted} />
       </View>
       <StyledAnimatedView
         position="absolute"
@@ -66,57 +106,13 @@ export default function Swipe() {
           top: liftViewY,
         }}
       >
-        <View
-          flex={1}
-          bg="$trueGray700"
-          borderBottomLeftRadius="$2xl"
-          borderBottomRightRadius="$2xl"
-        >
-          <Center flex={1}>
-            <Heading color="white">Feedback</Heading>
-            <ReviewForm
-              onCompleted={() => {
-                setViewYLiftable(true);
-              }}
-              onUncompleted={() => {
-                setViewYLiftable(false);
-              }}
-            />
-            <Textarea size="md" w="$72" mt="$4" borderColor="white">
-              <TextareaInput placeholder="Enter comments (Optional)..." />
-            </Textarea>
-          </Center>
-        </View>
+        <FirstScreen onComplete={setDisabled} />
         <View
           flex={1}
           maxHeight="$20"
           onMoveShouldSetResponder={() => true}
-          onResponderMove={(event) => {
-            if (!viewYLiftable) return;
-            prevTouchEvent.current = event.nativeEvent;
-            liftViewY.setValue(event.nativeEvent.pageY - liftedViewHeight);
-          }}
-          onResponderRelease={(event) => {
-            const pageY = event.nativeEvent.pageY;
-            const timestamp = event.nativeEvent.timestamp;
-            const prevPageY = prevTouchEvent.current?.pageY;
-            const prevTimestamp = prevTouchEvent.current?.timestamp;
-            const velocity = (pageY - prevPageY) / (timestamp - prevTimestamp);
-            if (pageY > liftedViewHeight * 0.2 && velocity < 1.5) {
-              Animated.spring(liftViewY, {
-                toValue: 0,
-                useNativeDriver: false,
-              }).start();
-            } else {
-              Animated.spring(liftViewY, {
-                toValue: -liftedViewHeight,
-                useNativeDriver: false,
-              }).start();
-              setTimeout(() => {
-                setReviewCompleted(true);
-              });
-            }
-          }}
+          onResponderMove={handleResponderMove}
+          onResponderRelease={handleResponderRelease}
         >
           <Center flex={1}>
             <Text>Swipe up to submit feedback</Text>
@@ -135,6 +131,292 @@ export default function Swipe() {
         ></StyledAnimatedView>
       </StyledAnimatedView>
     </View>
+  );
+}
+
+export function FirstScreen({ onComplete }: { onComplete: () => void }) {
+  return (
+    <View
+      flex={1}
+      bg="$trueGray700"
+      borderBottomLeftRadius="$2xl"
+      borderBottomRightRadius="$2xl"
+    >
+      <Center flex={1}>
+        <Heading color="white">Feedback</Heading>
+        <ReviewForm
+          onCompleted={() => {
+            onComplete && onComplete(true);
+          }}
+          onUncompleted={() => {
+            onComplete && onComplete(false);
+          }}
+        />
+        <Textarea size="md" w="$72" mt="$4" borderColor="white">
+          <TextareaInput placeholder="Enter comments (Optional)..." />
+        </Textarea>
+      </Center>
+    </View>
+  );
+}
+
+export function SecondView({
+  begin,
+  liftViewY,
+}: {
+  begin: boolean;
+  liftViewY: Animated.Value;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const liftedViewHeight = useWindowDimensions().height;
+  const beginTransition = useRef(new Animated.Value(0)).current;
+
+  const floatEffect = liftViewY.interpolate({
+    inputRange: [0, liftedViewHeight],
+    outputRange: [35, -35],
+  });
+
+  useEffect(() => {
+    if (begin) {
+      Animated.timing(beginTransition, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: false,
+      }).start();
+
+      setLoading(true);
+      sendRequest().then(() => {
+        setLoading(false);
+        setSuccess(true);
+        setTimeout(() => {
+          router.back();
+        }, 4000);
+      });
+    }
+  }, [begin]);
+
+  return (
+    <Center flex={1}>
+      <TripleCaretUpAnimation
+        begin={begin}
+        beginTransition={beginTransition}
+        floatEffect={floatEffect}
+      />
+      {loading && (
+        <VStack>
+          <ActivityIndicator color="black" size="large"></ActivityIndicator>
+          <Heading color="$trueGray700">Sending Feedback</Heading>
+        </VStack>
+      )}
+      {success && <SuccessTransition />}
+    </Center>
+  );
+}
+
+export function TripleCaretUpAnimation({
+  begin,
+  beginTransition,
+  floatEffect,
+}: {
+  begin: boolean;
+  beginTransition: Animated.Value;
+  floatEffect: Animated.AnimatedInterpolation<string | number>;
+}) {
+  const beat1 = useRef(new Animated.Value(0)).current;
+  const beat2 = useRef(new Animated.Value(0)).current;
+  const beat3 = useRef(new Animated.Value(0)).current;
+
+  const liftAnimationOpacity = beginTransition.interpolate({
+    inputRange: [0, 0.5],
+    outputRange: [1, 0],
+  });
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.stagger(100, [
+        Animated.timing(beat1, {
+          toValue: 1,
+          useNativeDriver: true,
+        }),
+        Animated.timing(beat2, {
+          toValue: 1,
+          useNativeDriver: true,
+        }),
+        Animated.timing(beat3, {
+          toValue: 1,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  return (
+    <StyledAnimatedView
+      position="absolute"
+      w="$full"
+      h="$full"
+      style={{
+        opacity: liftAnimationOpacity,
+        transform: [
+          {
+            translateY: floatEffect,
+          },
+        ],
+      }}
+    >
+      <Center flex={1}>
+        <VStack>
+          <AnimatedSvg
+            width={64}
+            height={64}
+            viewBox="0 0 512 512"
+            style={{
+              transform: [
+                {
+                  translateY: beat3.interpolate({
+                    inputRange: [0, 0.5, 1],
+                    outputRange: [0, -2, 0],
+                  }),
+                },
+              ],
+              opacity: beat3.interpolate({
+                inputRange: [0, 0.5, 1],
+                outputRange: [1, 0.75, 1],
+              }),
+            }}
+          >
+            <Path
+              fill="#0077e6"
+              d="M414,321.94,274.22,158.82a24,24,0,0,0-36.44,0L98,321.94c-13.34,15.57-2.28,39.62,18.22,39.62H395.82C416.32,361.56,427.38,337.51,414,321.94Z"
+            />
+          </AnimatedSvg>
+          <AnimatedSvg
+            width={64}
+            height={64}
+            viewBox="0 0 512 512"
+            style={{
+              transform: [
+                {
+                  translateY: beat2.interpolate({
+                    inputRange: [0, 0.5, 1],
+                    outputRange: [0, -2, 0],
+                  }),
+                },
+              ],
+              opacity: beat2.interpolate({
+                inputRange: [0, 0.5, 1],
+                outputRange: [1, 0.75, 1],
+              }),
+            }}
+          >
+            <Path
+              fill="#0077e6"
+              d="M414,321.94,274.22,158.82a24,24,0,0,0-36.44,0L98,321.94c-13.34,15.57-2.28,39.62,18.22,39.62H395.82C416.32,361.56,427.38,337.51,414,321.94Z"
+            />
+          </AnimatedSvg>
+          <AnimatedSvg
+            width={64}
+            height={64}
+            viewBox="0 0 512 512"
+            style={{
+              transform: [
+                {
+                  translateY: beat1.interpolate({
+                    inputRange: [0, 0.5, 1],
+                    outputRange: [0, -2, 0],
+                  }),
+                },
+              ],
+              opacity: beat1.interpolate({
+                inputRange: [0, 0.5, 1],
+                outputRange: [1, 0.75, 1],
+              }),
+            }}
+          >
+            <Path
+              fill="#0077e6"
+              d="M414,321.94,274.22,158.82a24,24,0,0,0-36.44,0L98,321.94c-13.34,15.57-2.28,39.62,18.22,39.62H395.82C416.32,361.56,427.38,337.51,414,321.94Z"
+            />
+          </AnimatedSvg>
+        </VStack>
+      </Center>
+    </StyledAnimatedView>
+  );
+}
+
+export function SuccessTransition() {
+  const checkBoxAnimation = useRef(new Animated.Value(0)).current;
+  const strokeOffset = checkBoxAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [55, 0],
+  });
+
+  useEffect(() => {
+    Animated.timing(checkBoxAnimation, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: false,
+    }).start();
+  }, []);
+
+  return (
+    <>
+      <Svg width={64} height={64} viewBox="0 0 40 40">
+        <AnimatedPath
+          stroke="green"
+          strokeWidth={5}
+          strokeDasharray={55}
+          strokeDashoffset={strokeOffset}
+          fill="none"
+          d="M14.1 27.2l7.1 7.2 16.7-16.8"
+        ></AnimatedPath>
+      </Svg>
+      <Heading
+        fontSize="$lg"
+        w="$48"
+        mt="$5"
+        textAlign="center"
+        lineHeight="$sm"
+        color="$trueGray700"
+      >
+        Your feedback has been successfully submitted
+      </Heading>
+    </>
+  );
+}
+
+export function Rate({
+  onComplete,
+}: {
+  onComplete: (complete: boolean) => void;
+}) {
+  const [rate, setRate] = useState(0);
+  useEffect(() => {
+    onComplete(!!rate);
+  }, [rate]);
+  return (
+    <HStack>
+      {Array.from({ length: 5 }).map((_, index) => {
+        const rateIndex = index + 1;
+        return (
+          <Pressable
+            key={index}
+            onPress={() => {
+              if (rateIndex === rate) {
+                setRate(0);
+                return;
+              }
+              setRate(rateIndex);
+            }}
+          >
+            <Text color="yellow" fontSize="$3xl">
+              {rateIndex <= rate ? "★" : "☆"}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </HStack>
   );
 }
 
@@ -196,40 +478,6 @@ export function ReviewForm({
   );
 }
 
-export function Rate({
-  onComplete,
-}: {
-  onComplete: (complete: boolean) => void;
-}) {
-  const [rate, setRate] = useState(0);
-  useEffect(() => {
-    onComplete(!!rate);
-  }, [rate]);
-  return (
-    <HStack>
-      {Array.from({ length: 5 }).map((_, index) => {
-        const rateIndex = index + 1;
-        return (
-          <Pressable
-            key={index}
-            onPress={() => {
-              if (rateIndex === rate) {
-                setRate(0);
-                return;
-              }
-              setRate(rateIndex);
-            }}
-          >
-            <Text color="yellow" fontSize="$3xl">
-              {rateIndex <= rate ? "★" : "☆"}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </HStack>
-  );
-}
-
 // artificial request to simulate a sent request
 async function sendRequest() {
   return new Promise((resolve) => {
@@ -239,208 +487,13 @@ async function sendRequest() {
   });
 }
 
-export function SecondView({
-  begin,
-  liftViewY,
-}: {
-  begin: boolean;
-  liftViewY: Animated.Value;
-}) {
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const liftedViewHeight = useWindowDimensions().height;
-  const floatEffect = liftViewY.interpolate({
-    inputRange: [0, liftedViewHeight],
-    outputRange: [35, -35],
-  });
-  const beat1 = useRef(new Animated.Value(0)).current;
-  const beat2 = useRef(new Animated.Value(0)).current;
-  const beat3 = useRef(new Animated.Value(0)).current;
-  const beginTransition = useRef(new Animated.Value(0)).current;
-  const liftAnimationOpacity = beginTransition.interpolate({
-    inputRange: [0, 0.5],
-    outputRange: [1, 0],
-  });
-
-  useEffect(() => {
-    if (!begin) {
-      Animated.loop(
-        Animated.stagger(100, [
-          Animated.timing(beat1, {
-            toValue: 1,
-            useNativeDriver: true,
-          }),
-          Animated.timing(beat2, {
-            toValue: 1,
-            useNativeDriver: true,
-          }),
-          Animated.timing(beat3, {
-            toValue: 1,
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
-    } else {
-      Animated.timing(beginTransition, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: false,
-      }).start();
-      setLoading(true);
-      sendRequest().then(() => {
-        setLoading(false);
-        setSuccess(true);
-        setTimeout(() => {
-          router.back();
-        }, 4000);
-      });
-    }
-  }, [begin]);
-
-  useEffect(() => {
-    console.log("🚀 ~ success:", success);
-  }, [success]);
-
+export function calculateVelocity(
+  initialPosition: number,
+  finalPosition: number,
+  initialTimestamp: number,
+  finalTimestamp: number
+) {
   return (
-    <Center flex={1}>
-      <StyledAnimatedView
-        position="absolute"
-        w="$full"
-        h="$full"
-        style={{
-          opacity: liftAnimationOpacity,
-          transform: [
-            {
-              translateY: floatEffect,
-            },
-          ],
-        }}
-      >
-        <Center flex={1}>
-          <VStack>
-            <AnimatedSvg
-              width={64}
-              height={64}
-              viewBox="0 0 512 512"
-              style={{
-                transform: [
-                  {
-                    translateY: beat3.interpolate({
-                      inputRange: [0, 0.5, 1],
-                      outputRange: [0, -2, 0],
-                    }),
-                  },
-                ],
-                opacity: beat3.interpolate({
-                  inputRange: [0, 0.5, 1],
-                  outputRange: [1, 0.75, 1],
-                }),
-              }}
-            >
-              <Path
-                fill="#0077e6"
-                d="M414,321.94,274.22,158.82a24,24,0,0,0-36.44,0L98,321.94c-13.34,15.57-2.28,39.62,18.22,39.62H395.82C416.32,361.56,427.38,337.51,414,321.94Z"
-              />
-            </AnimatedSvg>
-            <AnimatedSvg
-              width={64}
-              height={64}
-              viewBox="0 0 512 512"
-              style={{
-                transform: [
-                  {
-                    translateY: beat2.interpolate({
-                      inputRange: [0, 0.5, 1],
-                      outputRange: [0, -2, 0],
-                    }),
-                  },
-                ],
-                opacity: beat2.interpolate({
-                  inputRange: [0, 0.5, 1],
-                  outputRange: [1, 0.75, 1],
-                }),
-              }}
-            >
-              <Path
-                fill="#0077e6"
-                d="M414,321.94,274.22,158.82a24,24,0,0,0-36.44,0L98,321.94c-13.34,15.57-2.28,39.62,18.22,39.62H395.82C416.32,361.56,427.38,337.51,414,321.94Z"
-              />
-            </AnimatedSvg>
-            <AnimatedSvg
-              width={64}
-              height={64}
-              viewBox="0 0 512 512"
-              style={{
-                transform: [
-                  {
-                    translateY: beat1.interpolate({
-                      inputRange: [0, 0.5, 1],
-                      outputRange: [0, -2, 0],
-                    }),
-                  },
-                ],
-                opacity: beat1.interpolate({
-                  inputRange: [0, 0.5, 1],
-                  outputRange: [1, 0.75, 1],
-                }),
-              }}
-            >
-              <Path
-                fill="#0077e6"
-                d="M414,321.94,274.22,158.82a24,24,0,0,0-36.44,0L98,321.94c-13.34,15.57-2.28,39.62,18.22,39.62H395.82C416.32,361.56,427.38,337.51,414,321.94Z"
-              />
-            </AnimatedSvg>
-          </VStack>
-        </Center>
-      </StyledAnimatedView>
-      {loading && (
-        <VStack>
-          <ActivityIndicator color="black" size="large"></ActivityIndicator>
-          <Heading color="$trueGray700">Sending Feedback</Heading>
-        </VStack>
-      )}
-      {success && <SuccessTransition />}
-    </Center>
-  );
-}
-
-export function SuccessTransition() {
-  const checkBoxAnimation = useRef(new Animated.Value(0)).current;
-  const strokeOffset = checkBoxAnimation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [55, 0],
-  });
-
-  useEffect(() => {
-    Animated.timing(checkBoxAnimation, {
-      toValue: 1,
-      duration: 1000,
-      useNativeDriver: false,
-    }).start();
-  }, []);
-
-  return (
-    <>
-      <Svg width={64} height={64} viewBox="0 0 40 40">
-        <AnimatedPath
-          stroke="green"
-          strokeWidth={5}
-          strokeDasharray={55}
-          strokeDashoffset={strokeOffset}
-          fill="none"
-          d="M14.1 27.2l7.1 7.2 16.7-16.8"
-        ></AnimatedPath>
-      </Svg>
-      <Heading
-        fontSize="$lg"
-        w="$48"
-        mt="$5"
-        textAlign="center"
-        lineHeight="$sm"
-        color="$trueGray700"
-      >
-        Your feedback has been successfully submitted
-      </Heading>
-    </>
+    (finalPosition - initialPosition) / (finalTimestamp - initialTimestamp)
   );
 }

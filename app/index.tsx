@@ -61,6 +61,13 @@ export default function Home() {
       >
         <ButtonText>Swipe</ButtonText>
       </Button>
+      <Button
+        onPress={() => {
+          router.push("/animation/swipemod");
+        }}
+      >
+        <ButtonText>Modular Swipe</ButtonText>
+      </Button>
     </VStack>
   );
 }
